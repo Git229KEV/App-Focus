@@ -1,8 +1,8 @@
 import tkinter as tk
 import time
 import ctypes
-import pyautogui
 import keyboard
+from PIL import Image, ImageTk
 
 class FocusApp:
     def __init__(self, master):
@@ -19,6 +19,15 @@ class FocusApp:
         self.stop_button = tk.Button(master, text="Stop", command=self.stop_focus, state=tk.DISABLED)
         self.stop_button.pack()
 
+        # Load the image
+        try:
+            self.image = Image.open("C:\\Users\\Kevin\\Dropbox\\PC\\Downloads\\App_focus.png")
+            self.photo = ImageTk.PhotoImage(self.image)
+            self.label = tk.Label(master, image=self.photo)
+            self.label.pack(pady=20)
+        except FileNotFoundError:
+            print("Image file not found")
+
     def start_focus(self):
         self.start_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
@@ -27,7 +36,10 @@ class FocusApp:
         keyboard.block_key('alt')
         keyboard.block_key('tab')
 
-        # Set focus for a fixed period (in seconds)
+        # Hide the taskbar
+        self.hide_taskbar()
+
+        # Set focus for a fixed period (in seconds) 
         focus_time = 10  # Change this to your desired focus time
         end_time = time.time() + focus_time
 
@@ -45,9 +57,20 @@ class FocusApp:
         keyboard.unblock_key('alt')
         keyboard.unblock_key('tab')
 
+        # Show the taskbar
+        self.show_taskbar()
+
     def stop_focus(self):
         # Placeholder for stopping focus (optional)
         pass
+
+    def hide_taskbar(self):
+        hwnd = ctypes.windll.user32.FindWindowW(u"Shell_TrayWnd", None)
+        ctypes.windll.user32.ShowWindow(hwnd, 0)  # 0 for hide
+
+    def show_taskbar(self):
+        hwnd = ctypes.windll.user32.FindWindowW(u"Shell_TrayWnd", None)
+        ctypes.windll.user32.ShowWindow(hwnd, 5)  # 5 for show
 
 def main():
     root = tk.Tk()
